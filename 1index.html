@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luyện Thi HSG KHTN 9 - Sinh Học GDPT 2018</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --danger: #dc2626;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 20px; line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; }
+
+        header { background: linear-gradient(135deg, #1e293b, #0f172a); color: white; padding: 25px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        header h1 { font-size: 1.5rem; margin-bottom: 8px; text-align: center; }
+        header p { font-size: 0.95rem; opacity: 0.9; text-align: center; }
+
+        .card { background: var(--card); padding: 25px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; }
+
+        .btn { background: var(--primary); color: white; border: none; padding: 12px 24px; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.2s; }
+        .btn:hover { background: var(--primary-hover); }
+
+        #timer-sticky { position: sticky; top: 10px; z-index: 100; background: #fef08a; border: 2px solid #eab308; color: #854d0e; padding: 10px; border-radius: 8px; font-weight: bold; text-align: center; margin-bottom: 20px; }
+
+        .section-title { font-size: 1.2rem; background: #e0f2fe; color: #0369a1; padding: 10px 15px; border-radius: 8px; margin: 20px 0 15px 0; font-weight: bold; }
+        .question-box { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
+        .question-title { font-weight: 600; margin-bottom: 10px; }
+
+        /* Component Phần 1 */
+        .options-grid { display: grid; gap: 8px; margin-top: 8px; }
+        .option-item { display: flex; align-items: center; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; }
+        .option-item input { margin-right: 10px; }
+
+        /* Component Phần 2 (Đúng/Sai) */
+        .tf-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .tf-table th, .tf-table td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+        .tf-table th { background: #f1f5f9; text-align: center; }
+        .tf-table td:nth-child(2), .tf-table td:nth-child(3) { text-align: center; width: 70px; }
+
+        /* Result View */
+        .score-board { text-align: center; padding: 20px; background: #f0fdf4; border: 2px solid #22c55e; border-radius: 12px; margin-bottom: 20px; }
+        .score-num { font-size: 2.5rem; color: var(--success); font-weight: bold; }
+        .explain-box { background: #f8fafc; border-left: 4px solid var(--primary); padding: 10px 15px; margin-top: 8px; border-radius: 0 8px 8px 0; font-size: 0.9rem; color: #334155; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>ÔN THI HSG KHTN 9 - PHÂN MÔN SINH HỌC</h1>
+        <p>Hệ thống tự động chấm điểm & gửi kết quả GDPT 2018</p>
+    </header>
+
+    <!-- FORM ĐĂNG NHẬP -->
+    <div id="login-card" class="card">
+        <h2 style="margin-bottom: 15px; font-size: 1.2rem;">Thông tin học sinh</h2>
+        <div class="form-group">
+            <label>Họ và tên học sinh:</label>
+            <input type="text" id="student-name" placeholder="Ví dụ: Nguyễn Văn A" required>
+        </div>
+        <div class="form-group">
+            <label>Lớp:</label>
+            <input type="text" id="class-name" placeholder="Ví dụ: 9A1" required>
+        </div>
+        <div class="form-group">
+            <label>Chọn Bài học luyện tập:</label>
+            <select id="lesson-select">
+                <option value="Bài 34 - Lai một cặp tính trạng">Bài 34 - Lai một cặp tính trạng và phép lai phân tích</option>
+            </select>
+        </div>
+        <button class="btn" onclick="startQuiz()">Bắt Đầu Làm Bài</button>
+    </div>
+
+    <!-- KHU VỰC LÀM BÀI -->
+    <div id="quiz-card" class="card hidden">
+        <div id="timer-sticky">Thời gian còn lại: <span id="time-display">30:00</span></div>
+        <form id="quiz-form">
+            <div id="quiz-content"></div>
+            <button type="button" class="btn" style="margin-top: 20px; background: var(--success);" onclick="submitQuiz()">Nộp Bài Luyện Tập</button>
+        </form>
+    </div>
+
+    <!-- KHU VỰC KẾT QUẢ -->
+    <div id="result-card" class="card hidden">
+        <div class="score-board">
+            <h2>KẾT QUẢ BÀI LÀM</h2>
+            <div class="score-num" id="total-score-display">0.0</div>
+            <p id="sub-scores-display" style="color: #475569; margin-top: 5px;"></p>
+        </div>
+        <h3 style="margin-bottom: 15px;">Chi tiết bài làm & Lời giải HSG:</h3>
+        <div id="review-content"></div>
+    </div>
+</div>
+
+<script>
+// =========================================================================
+// THÀNH PHẦN 2: CẤU TRÚC DỮ LIỆU CÂU HỎI GDPT 2018
+// =========================================================================
+const quizData = {
+    "title": "Bài 34 - Lai một cặp tính trạng và phép lai phân tích",
+    "timeMinutes": 30,
+    "part1": [
+        {
+            "id": "p1_1",
+            "question": "Câu 1 (Phần 1): Khi cho giao phấn giữa hai cây đậu Hà Lan thuần chủng hoa đỏ và hoa trắng, F1 thu được 100% hoa đỏ. Cho F1 tự thụ phấn, F2 thu được tỉ lệ kiểu hình là:",
+            "options": ["3 hoa đỏ : 1 hoa trắng", "1 hoa đỏ : 1 hoa trắng", "100% hoa đỏ", "1 hoa đỏ : 2 hoa hồng : 1 hoa trắng"],
+            "answer": 0,
+            "explain": "Theo quy luật phân li của Mendel, P thuần chủng khác nhau về 1 cặp tính trạng tương phản -> F1 đồng tính trội -> F2 phân li tỉ lệ 3 Trội : 1 Lặn."
+        },
+        {
+            "id": "p1_2",
+            "question": "Câu 2 (Phần 1): Phép lai nào sau đây được coi là phép lai phân tích?",
+            "options": ["Aa x Aa", "AA x Aa", "Aa x aa", "AA x AA"],
+            "answer": 2,
+            "explain": "Phép lai phân tích là phép lai giữa cá thể mang tính trạng trội cần xác định kiểu gene với cá thể mang tính trạng lặn (aa)."
+        }
+    ],
+    "part2": [
+        {
+            "id": "p2_1",
+            "question": "Câu 1 (Phần 2): Ở cà chua, quả đỏ (A) trội hoàn toàn so với quả vàng (a). Cho cây quả đỏ không thuần chủng tự thụ phấn thu được F1. Xét tính đúng/sai của các phát biểu sau:",
+            "items": [
+                { "text": "a) Cây quả đỏ không thuần chủng có kiểu gene là Aa.", "answer": true },
+                { "text": "b) Tỉ lệ kiểu gene ở F1 thu được là 1AA : 2Aa : 1aa.", "answer": true },
+                { "text": "c) Tỉ lệ kiểu hình ở F1 thu được là 50% quả đỏ : 50% quả vàng.", "answer": false },
+                { "text": "d) Trong số các cây quả đỏ ở F1, cây thuần chủng chiếm tỉ lệ 1/3.", "answer": true }
+            ],
+            "explain": "Phép lai Aa x Aa -> F1: 1AA : 2Aa : 1aa (3 đỏ : 1 vàng). Do đó phát biểu c sai (tỉ lệ đỏ là 75%). Trong số quả đỏ (1AA, 2Aa), cây thuần chủng AA chiếm 1/3 -> d đúng."
+        }
+    ],
+    "part3": [
+        {
+            "id": "p3_1",
+            "question": "Câu 1 (Phần 3): Ở một loài thực vật, gen A quy định thân cao trội hoàn toàn so với gen a quy định thân thấp. Thực hiện phép lai giữa cây thân cao Aa với cây thân thấp aa. Tính theo lý thuyết, tỉ lệ % số cây thân cao thu được ở đời con là bao nhiêu?",
+            "answer": "50",
+            "explain": "Phép lai Aa x aa -> Đời con thu được 1/2 Aa (Thân cao) : 1/2 aa (Thân thấp). Tỉ lệ % cây thân cao là 50%."
+        }
+    ]
+};
+
+// =========================================================================
+// QUẢN LÝ KẾT NỐI API VÀ THỜI GIAN
+// =========================================================================
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyosXpQ1czXJp6BcMpil41S2W_AGlLuMuSDzMeA2fjKGZFCbgC0YFxfS-e3YdxOQc_Jsg/exec";
+
+let timerInterval;
+let timeLeft = 0;
+let studentInfo = {};
+
+function startQuiz() {
+    const name = document.getElementById("student-name").value.trim();
+    const className = document.getElementById("class-name").value.trim();
+    if (!name || !className) {
+        alert("Vui lòng nhập đầy đủ Họ tên và Lớp!");
+        return;
+    }
+
+    studentInfo = {
+        name: name,
+        className: className,
+        lesson: document.getElementById("lesson-select").value
+    };
+
+    document.getElementById("login-card").classList.add("hidden");
+    document.getElementById("quiz-card").classList.remove("hidden");
+
+    renderQuiz();
+    startTimer(quizData.timeMinutes * 60);
+}
+
+function startTimer(seconds) {
+    timeLeft = seconds;
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            alert("Hết giờ làm bài! Hệ thống sẽ tự động nộp bài.");
+            submitQuiz();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+    const s = (timeLeft % 60).toString().padStart(2, '0');
+    document.getElementById("time-display").innerText = `${m}:${s}`;
+}
+
+function renderQuiz() {
+    let html = "";
+
+    // Render Phần 1
+    html += `<div class="section-title">PHẦN 1: Trắc nghiệm 4 lựa chọn (Chọn 1 đáp án đúng)</div>`;
+    quizData.part1.forEach((q, idx) => {
+        html += `<div class="question-box">
+            <div class="question-title">${q.question}</div>
+            <div class="options-grid">`;
+        q.options.forEach((opt, optIdx) => {
+            html += `<label class="option-item">
+                <input type="radio" name="${q.id}" value="${optIdx}"> ${String.fromCharCode(65 + optIdx)}. ${opt}
+            </label>`;
+        });
+        html += `</div></div>`;
+    });
+
+    // Render Phần 2
+    html += `<div class="section-title">PHẦN 2: Trắc nghiệm Đúng/Sai</div>`;
+    quizData.part2.forEach((q, idx) => {
+        html += `<div class="question-box">
+            <div class="question-title">${q.question}</div>
+            <table class="tf-table">
+                <thead><tr><th>Lựa chọn / Ý</th><th>Đúng</th><th>Sai</th></tr></thead>
+                <tbody>`;
+        q.items.forEach((item, itemIdx) => {
+            html += `<tr>
+                <td>${item.text}</td>
+                <td><input type="radio" name="${q.id}_${itemIdx}" value="true"></td>
+                <td><input type="radio" name="${q.id}_${itemIdx}" value="false"></td>
+            </tr>`;
+        });
+        html += `</tbody></table></div>`;
+    });
+
+    // Render Phần 3
+    html += `<div class="section-title">PHẦN 3: Trắc nghiệm trả lời ngắn</div>`;
+    quizData.part3.forEach((q, idx) => {
+        html += `<div class="question-box">
+            <div class="question-title">${q.question}</div>
+            <div class="form-group" style="margin-top: 10px;">
+                <input type="text" name="${q.id}" placeholder="Nhập đáp án (chỉ điền số hoặc từ khóa ngắn)...">
+            </div>
+        </div>`;
+    });
+
+    document.getElementById("quiz-content").innerHTML = html;
+}
+
+function submitQuiz() {
+    clearInterval(timerInterval);
+
+    let scoreP1 = 0, scoreP2 = 0, scoreP3 = 0;
+    let details = { part1: [], part2: [], part3: [] };
+
+    // Chấm Phần 1 (Mỗi câu 0.5 điểm)
+    const p1Weight = 4 / quizData.part1.length;
+    quizData.part1.forEach(q => {
+        const selected = document.querySelector(`input[name="${q.id}"]:checked`);
+        const userAns = selected ? parseInt(selected.value) : -1;
+        const isCorrect = userAns === q.answer;
+        if (isCorrect) scoreP1 += p1Weight;
+        details.part1.push({ id: q.id, userAns, isCorrect });
+    });
+
+    // Chấm Phần 2 (Thang điểm chuẩn GDPT 2018)
+    quizData.part2.forEach(q => {
+        let correctCount = 0;
+        let itemResults = [];
+        q.items.forEach((item, itemIdx) => {
+            const selected = document.querySelector(`input[name="${q.id}_${itemIdx}"]:checked`);
+            const userAns = selected ? (selected.value === "true") : null;
+            const isCorrect = userAns === item.answer;
+            if (isCorrect) correctCount++;
+            itemResults.push({ userAns, isCorrect });
+        });
+
+        let qScore = 0;
+        if (correctCount === 1) qScore = 0.1;
+        else if (correctCount === 2) qScore = 0.25;
+        else if (correctCount === 3) qScore = 0.5;
+        else if (correctCount === 4) qScore = 1.0;
+
+        scoreP2 += qScore;
+        details.part2.push({ id: q.id, correctCount, qScore, itemResults });
+    });
+
+    // Chấm Phần 3 (Mỗi câu 0.5 điểm)
+    const p3Weight = 2 / quizData.part3.length;
+    quizData.part3.forEach(q => {
+        const input = document.querySelector(`input[name="${q.id}"]`);
+        const userAns = input ? input.value.trim().toLowerCase() : "";
+        const isCorrect = userAns === q.answer.toLowerCase();
+        if (isCorrect) scoreP3 += p3Weight;
+        details.part3.push({ id: q.id, userAns, isCorrect });
+    });
+
+    const totalScore = (scoreP1 + scoreP2 + scoreP3).toFixed(2);
+
+    // =========================================================================
+    // CHUYỂN DỮ LIỆU SANG URLSEARCHPARAMS ĐỂ TRÁNH LỖI CORS VÀ GỬI VỀ GOOGLE SHEETS
+    // =========================================================================
+    const formData = new URLSearchParams();
+    formData.append("studentName", studentInfo.name);
+    formData.append("className", studentInfo.className);
+    formData.append("lessonName", studentInfo.lesson);
+    formData.append("scoreP1", scoreP1.toFixed(2));
+    formData.append("scoreP2", scoreP2.toFixed(2));
+    formData.append("scoreP3", scoreP3.toFixed(2));
+    formData.append("totalScore", totalScore);
+    formData.append("details", JSON.stringify(details));
+
+    if (SCRIPT_URL && SCRIPT_URL !== "https://script.google.com/macros/s/AKfycbyosXpQ1czXJp6BcMpil41S2W_AGlLuMuSDzMeA2fjKGZFCbgC0YFxfS-e3YdxOQc_Jsg/exec") {
+        fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData.toString()
+        }).then(() => {
+            console.log("Đã gửi dữ liệu bài làm về Google Sheets thành công!");
+        }).catch(err => console.error("Lỗi khi gửi dữ liệu:", err));
+    }
+
+    // Hiển thị giao diện kết quả làm bài
+    document.getElementById("quiz-card").classList.add("hidden");
+    document.getElementById("result-card").classList.remove("hidden");
+
+    document.getElementById("total-score-display").innerText = `${totalScore} / 10`;
+    document.getElementById("sub-scores-display").innerText = 
+        `Phần 1: ${scoreP1.toFixed(2)} đ | Phần 2: ${scoreP2.toFixed(2)} đ | Phần 3: ${scoreP3.toFixed(2)} đ`;
+
+    renderReview();
+}
+
+function renderReview() {
+    let html = "";
+
+    // Review P1
+    html += `<div class="section-title">Lời giải Phần 1</div>`;
+    quizData.part1.forEach((q, idx) => {
+        html += `<div class="question-box">
+            <div class="question-title">${q.question}</div>
+            <div style="color: var(--success); font-weight: 600;">Đáp án đúng: ${String.fromCharCode(65 + q.answer)}. ${q.options[q.answer]}</div>
+            <div class="explain-box"><strong>Lời giải HSG:</strong> ${q.explain}</div>
+        </div>`;
+    });
+
+    // Review P2
+    html += `<div class="section-title">Lời giải Phần 2</div>`;
+    quizData.part2.forEach((q, idx) => {
+        html += `<div class="question-box">
+            <div class="question-title">${q.question}</div>`;
+        q.items.forEach(item => {
+            html += `<div style="margin-left: 10px;">• ${item.text} -> <strong>${item.answer ? "ĐÚNG" : "SAI"}</strong></div>`;
+        });
+        html += `<div class="explain-box"><strong>Lời giải HSG:</strong> ${q.explain}</div></div>`;
+    });
+
+    // Review P3
+    html += `<div class="section-title">Lời giải Phần 3</div>`;
+    quizData.part3.forEach((q, idx) => {
+        html += `<div class="question-box">
+            <div class="question-title">${q.question}</div>
+            <div style="color: var(--success); font-weight: 600;">Đáp án chuẩn: ${q.answer}</div>
+            <div class="explain-box"><strong>Lời giải HSG:</strong> ${q.explain}</div>
+        </div>`;
+    });
+
+    document.getElementById("review-content").innerHTML = html;
+}
+</script>
+
+</body>
+</html>
