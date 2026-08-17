@@ -156,7 +156,7 @@ const quizData = {
 // =========================================================================
 // QUẢN LÝ LỘ TRÌNH VÀ CẤU HÌNH (ĐÃ THAY BẰNG WEB APP URL CỦA BẠN)
 // =========================================================================
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw5hSL0y7OoGyPuY7a01n-nXb9HqI8FN9T8xBo_qJNcsZWoW92wEqghCNpbHZg1oGGYIQ/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzE8kFYSH9sr9_Dpg-URoiSLGuUJ1nU14rKapBkU6A-WClKpUK5GFpklTNupI1Jd6p1qw/exec";
 
 let timerInterval;
 let timeLeft = 0;
@@ -314,7 +314,7 @@ function submitQuiz() {
         details: details
     };
 
-    if (SCRIPT_URL && SCRIPT_URL !== "https://script.google.com/macros/s/AKfycbw5hSL0y7OoGyPuY7a01n-nXb9HqI8FN9T8xBo_qJNcsZWoW92wEqghCNpbHZg1oGGYIQ/exec") {
+    if (SCRIPT_URL && SCRIPT_URL !== "https://script.google.com/macros/s/AKfycbzE8kFYSH9sr9_Dpg-URoiSLGuUJ1nU14rKapBkU6A-WClKpUK5GFpklTNupI1Jd6p1qw/exec") {
         fetch(SCRIPT_URL, {
             method: "POST",
             mode: "no-cors",
