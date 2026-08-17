@@ -109,7 +109,7 @@
 
 <script>
 // =========================================================================
-// THÀNH PHẦN 2: CẤU TRÚC DỮ LIỆU CÂU HỎI (CÓ THỂ BỔ SUNG CÁC BÀI KHÁC VÀO ĐÂY)
+// THÀNH PHẦN 2: CẤU TRÚC DỮ LIỆU CÂU HỎI GDPT 2018
 // =========================================================================
 const quizData = {
     "title": "Bài 34 - Lai một cặp tính trạng và phép lai phân tích",
@@ -120,7 +120,7 @@ const quizData = {
             "question": "Câu 1 (Phần 1): Khi cho giao phấn giữa hai cây đậu Hà Lan thuần chủng hoa đỏ và hoa trắng, F1 thu được 100% hoa đỏ. Cho F1 tự thụ phấn, F2 thu được tỉ lệ kiểu hình là:",
             "options": ["3 hoa đỏ : 1 hoa trắng", "1 hoa đỏ : 1 hoa trắng", "100% hoa đỏ", "1 hoa đỏ : 2 hoa hồng : 1 hoa trắng"],
             "answer": 0,
-            "explain": "Theo quy luật phân li của Mendel, P thuần chủng khác nhau về 1 cặp tính trạng tương phản $\\rightarrow$ F1 đồng tính trội $\\rightarrow$ F2 phân li tỉ lệ 3 Trội : 1 Lặn."
+            "explain": "Theo quy luật phân li của Mendel, P thuần chủng khác nhau về 1 cặp tính trạng tương phản -> F1 đồng tính trội -> F2 phân li tỉ lệ 3 Trội : 1 Lặn."
         },
         {
             "id": "p1_2",
@@ -140,7 +140,7 @@ const quizData = {
                 { "text": "c) Tỉ lệ kiểu hình ở F1 thu được là 50% quả đỏ : 50% quả vàng.", "answer": false },
                 { "text": "d) Trong số các cây quả đỏ ở F1, cây thuần chủng chiếm tỉ lệ 1/3.", "answer": true }
             ],
-            "explain": "Phép lai Aa x Aa $\\rightarrow$ F1: 1AA : 2Aa : 1aa (3 đỏ : 1 vàng). Do đó phát biểu c sai (tỉ lệ đỏ là 75%). Trong số quả đỏ (1AA, 2Aa), cây thuần chủng AA chiếm 1/3 $\\rightarrow$ d đúng."
+            "explain": "Phép lai Aa x Aa -> F1: 1AA : 2Aa : 1aa (3 đỏ : 1 vàng). Do đó phát biểu c sai (tỉ lệ đỏ là 75%). Trong số quả đỏ (1AA, 2Aa), cây thuần chủng AA chiếm 1/3 -> d đúng."
         }
     ],
     "part3": [
@@ -148,15 +148,15 @@ const quizData = {
             "id": "p3_1",
             "question": "Câu 1 (Phần 3): Ở một loài thực vật, gen A quy định thân cao trội hoàn toàn so với gen a quy định thân thấp. Thực hiện phép lai giữa cây thân cao Aa với cây thân thấp aa. Tính theo lý thuyết, tỉ lệ % số cây thân cao thu được ở đời con là bao nhiêu?",
             "answer": "50",
-            "explain": "Phép lai Aa x aa $\\rightarrow$ Đời con thu được 1/2 Aa (Thân cao) : 1/2 aa (Thân thấp). Tỉ lệ % cây thân cao là 50%."
+            "explain": "Phép lai Aa x aa -> Đời con thu được 1/2 Aa (Thân cao) : 1/2 aa (Thân thấp). Tỉ lệ % cây thân cao là 50%."
         }
     ]
 };
 
 // =========================================================================
-// QUẢN LÝ LỘ TRÌNH VÀ CẤU HÌNH (ĐÃ THAY BẰNG WEB APP URL CỦA BẠN)
+// QUẢN LÝ KẾT NỐI API VÀ THỜI GIAN
 // =========================================================================
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfNnsNyhKFjfmFP53Zy00BfRL8bHA1Cwn8XDOOB6VS2dLo0nvVJFqtgJg3Cb8wGkjrAA/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyosXpQ1czXJp6BcMpil41S2W_AGlLuMuSDzMeA2fjKGZFCbgC0YFxfS-e3YdxOQc_Jsg/exec";
 
 let timerInterval;
 let timeLeft = 0;
@@ -268,7 +268,7 @@ function submitQuiz() {
         details.part1.push({ id: q.id, userAns, isCorrect });
     });
 
-    // Chấm Phần 2 (Quy tắc thang điểm GDPT 2018: 1 ý=0.1, 2 ý=0.25, 3 ý=0.5, 4 ý=1.0)
+    // Chấm Phần 2 (Thang điểm chuẩn GDPT 2018)
     quizData.part2.forEach(q => {
         let correctCount = 0;
         let itemResults = [];
@@ -302,28 +302,33 @@ function submitQuiz() {
 
     const totalScore = (scoreP1 + scoreP2 + scoreP3).toFixed(2);
 
-    // Gửi kết quả về Google Sheets
-    const payload = {
-        studentName: studentInfo.name,
-        className: studentInfo.className,
-        lessonName: studentInfo.lesson,
-        scoreP1: scoreP1.toFixed(2),
-        scoreP2: scoreP2.toFixed(2),
-        scoreP3: scoreP3.toFixed(2),
-        totalScore: totalScore,
-        details: details
-    };
+    // =========================================================================
+    // CHUYỂN DỮ LIỆU SANG URLSEARCHPARAMS ĐỂ TRÁNH LỖI CORS VÀ GỬI VỀ GOOGLE SHEETS
+    // =========================================================================
+    const formData = new URLSearchParams();
+    formData.append("studentName", studentInfo.name);
+    formData.append("className", studentInfo.className);
+    formData.append("lessonName", studentInfo.lesson);
+    formData.append("scoreP1", scoreP1.toFixed(2));
+    formData.append("scoreP2", scoreP2.toFixed(2));
+    formData.append("scoreP3", scoreP3.toFixed(2));
+    formData.append("totalScore", totalScore);
+    formData.append("details", JSON.stringify(details));
 
-    if (SCRIPT_URL && SCRIPT_URL !== "https://script.google.com/macros/s/AKfycbwfNnsNyhKFjfmFP53Zy00BfRL8bHA1Cwn8XDOOB6VS2dLo0nvVJFqtgJg3Cb8wGkjrAA/exec") {
+    if (SCRIPT_URL && SCRIPT_URL !== "https://script.google.com/macros/s/AKfycbyosXpQ1czXJp6BcMpil41S2W_AGlLuMuSDzMeA2fjKGZFCbgC0YFxfS-e3YdxOQc_Jsg/exec") {
         fetch(SCRIPT_URL, {
             method: "POST",
             mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        }).catch(err => console.error("Lỗi gửi điểm:", err));
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData.toString()
+        }).then(() => {
+            console.log("Đã gửi dữ liệu bài làm về Google Sheets thành công!");
+        }).catch(err => console.error("Lỗi khi gửi dữ liệu:", err));
     }
 
-    // Hiển thị giao diện kết quả
+    // Hiển thị giao diện kết quả làm bài
     document.getElementById("quiz-card").classList.add("hidden");
     document.getElementById("result-card").classList.remove("hidden");
 
@@ -353,7 +358,7 @@ function renderReview() {
         html += `<div class="question-box">
             <div class="question-title">${q.question}</div>`;
         q.items.forEach(item => {
-            html += `<div style="margin-left: 10px;">• ${item.text} $\rightarrow$ <strong>${item.answer ? "ĐÚNG" : "SAI"}</strong></div>`;
+            html += `<div style="margin-left: 10px;">• ${item.text} -> <strong>${item.answer ? "ĐÚNG" : "SAI"}</strong></div>`;
         });
         html += `<div class="explain-box"><strong>Lời giải HSG:</strong> ${q.explain}</div></div>`;
     });
